@@ -21,6 +21,7 @@ export function SegmentedControl<T extends string>({ value, options, onChange }:
             accessibilityRole="radio"
             accessibilityState={{ selected }}
             onPress={() => onChange(option.value)}
+            containerStyle={styles.item}
             style={[styles.segment, { borderRadius: radius.sm, backgroundColor: selected ? colors.accent : 'transparent' }]}
           >
             <AppText variant="label" style={{ color: selected ? colors.onAccent : colors.textMuted }}>
@@ -35,5 +36,6 @@ export function SegmentedControl<T extends string>({ value, options, onChange }:
 
 const styles = StyleSheet.create({
   track: { flexDirection: 'row', padding: 4, gap: 4 },
-  segment: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  item: { flex: 1 },
+  segment: { minHeight: 44, alignItems: 'center', justifyContent: 'center' },
 });
