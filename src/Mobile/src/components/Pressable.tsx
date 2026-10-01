@@ -3,19 +3,23 @@ import { Animated, Pressable, type PressableProps, type StyleProp, type ViewStyl
 import * as Haptics from 'expo-haptics';
 
 interface ScalePressableProps extends Omit<PressableProps, 'style' | 'children'> {
+  /** Style of the animated content. */
   style?: StyleProp<ViewStyle>;
+  /** Layout style of the outer touch target (e.g. `flex: 1` inside a row). */
+  containerStyle?: StyleProp<ViewStyle>;
   children: ReactNode;
   haptic?: boolean;
   pressedScale?: number;
 }
 
 /** Pressable with a subtle spring scale and optional haptic tick: tactile without looking busy. */
-export function ScalePressable({ style, children, haptic = true, pressedScale = 0.97, onPressIn, onPressOut, onPress, ...rest }: ScalePressableProps) {
+export function ScalePressable({ style, containerStyle, children, haptic = true, pressedScale = 0.97, onPressIn, onPressOut, onPress, ...rest }: ScalePressableProps) {
   const [scale] = useState(() => new Animated.Value(1));
   const animate = (to: number) => Animated.spring(scale, { toValue: to, useNativeDriver: true, speed: 40, bounciness: 6 }).start();
 
   return (
     <Pressable
+      style={containerStyle}
       hitSlop={8}
       onPressIn={(e) => {
         animate(pressedScale);

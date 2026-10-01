@@ -12,8 +12,8 @@ export function Card({ children, style, padded = true }: { children: ReactNode; 
           borderRadius: radius.lg,
           borderWidth: scheme === 'light' ? 1 : 0,
           borderColor: colors.border,
-          padding: padded ? 20 : 0,
         },
+        padded && { padding: 20 },
         style,
       ]}
     >

@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -27,6 +27,10 @@ export function DriveScreen() {
   const inChannel = useVoiceStore((s) => s.participants.length);
   const muted = useVoiceStore((s) => s.muted);
   const now = useNow(30_000, journey.driving);
+  const { height } = useWindowDimensions();
+  // Fit the hero on common phones (incl. safe-area insets); the screen scrolls as a fallback on small ones.
+  const buttonSize = Math.round(Math.min(216, Math.max(148, height * 0.22)));
+  const compactControls = height < 880;
 
   const onDrivePress = async () => {
     if (journey.driving) {
@@ -61,7 +65,7 @@ export function DriveScreen() {
   const voiceDot = journey.voice === 'live' ? colors.accent : journey.voice === 'off' ? colors.textFaint : colors.warning;
 
   return (
-    <Screen>
+    <Screen scroll contentStyle={styles.content}>
       <View style={styles.header}>
         <Wordmark />
         <ConnectionPill />
@@ -70,7 +74,13 @@ export function DriveScreen() {
       <StatusBanner />
 
       <View style={styles.hero}>
-        <DriveButton driving={journey.driving} busy={journey.transitioning} live={journey.driving} onPress={() => void onDrivePress()} />
+        <DriveButton
+          size={buttonSize}
+          driving={journey.driving}
+          busy={journey.transitioning}
+          live={journey.driving}
+          onPress={() => void onDrivePress()}
+        />
         <AppText variant="title" align="center">
           {journey.driving ? 'Driving' : 'Ready when you are'}
         </AppText>
@@ -102,7 +112,7 @@ export function DriveScreen() {
 
       {journey.driving ? (
         <>
-          <VoiceControls />
+          <VoiceControls compact={compactControls} />
           <View style={styles.privacy} accessibilityRole="text">
             <Ionicons name="location" size={14} color={colors.textMuted} />
             <AppText variant="caption" tone="muted">
@@ -124,7 +134,8 @@ export function DriveScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 },
-  hero: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4, minHeight: 360 },
+  content: { flexGrow: 1 },
+  hero: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', gap: 4, paddingBottom: 8 },
   tiles: { flexDirection: 'row', gap: 12 },
   privacy: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
 });

@@ -20,6 +20,7 @@ export function StatusTile({ icon, label, value, detail, dotColor, pulse, onPres
   const { colors } = useTheme();
   return (
     <ScalePressable
+      containerStyle={styles.flex}
       style={styles.flex}
       onPress={onPress}
       disabled={!onPress}
@@ -51,7 +52,7 @@ export function StatusTile({ icon, label, value, detail, dotColor, pulse, onPres
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  card: { gap: 10, minHeight: 116 },
+  card: { flex: 1, gap: 10, minHeight: 112 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   valueRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 });

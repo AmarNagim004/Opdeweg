@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 
 /** Concentric rings expanding outward — the "live" signal around the drive button and active speakers. */
-export function PulseRings({ size, color, active, rings = 3 }: { size: number; color: string; active: boolean; rings?: number }) {
+export function PulseRings({ size, color, active, rings = 3, spread = 1.55 }: { size: number; color: string; active: boolean; rings?: number; spread?: number }) {
   const [values] = useState(() => Array.from({ length: rings }, () => new Animated.Value(0)));
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export function PulseRings({ size, color, active, rings = 3 }: { size: number; c
             borderWidth: 2,
             borderColor: color,
             opacity: value.interpolate({ inputRange: [0, 0.1, 1], outputRange: [0, 0.55, 0] }),
-            transform: [{ scale: value.interpolate({ inputRange: [0, 1], outputRange: [1, 1.55] }) }],
+            transform: [{ scale: value.interpolate({ inputRange: [0, 1], outputRange: [1, spread] }) }],
           }}
         />
       ))}

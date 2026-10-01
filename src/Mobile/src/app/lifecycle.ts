@@ -70,12 +70,17 @@ export function startAppLifecycle(): void {
     }
   });
 
+  let keepAwakeActive = false;
   const syncKeepAwake = () => {
     const shouldKeepAwake = useUiStore.getState().keepScreenAwake && useDrivingStore.getState().status === 'active';
-    if (shouldKeepAwake) {
-      void activateKeepAwakeAsync(KEEP_AWAKE_TAG);
-    } else {
-      void deactivateKeepAwake(KEEP_AWAKE_TAG);
+    if (shouldKeepAwake && !keepAwakeActive) {
+      keepAwakeActive = true;
+      activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {
+        keepAwakeActive = false;
+      });
+    } else if (!shouldKeepAwake && keepAwakeActive) {
+      keepAwakeActive = false;
+      deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => undefined);
     }
   };
   useDrivingStore.subscribe(syncKeepAwake);
