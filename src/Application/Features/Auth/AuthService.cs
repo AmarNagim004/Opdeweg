@@ -92,7 +92,11 @@ public sealed class AuthService(
             throw InvalidRefreshToken();
         }
 
-        if (existing.RevokedAt is not null)
+        var benignRace = existing.RevokedAt is { } revokedAt &&
+            existing.ReplacedByTokenId is not null &&
+            now - revokedAt <= TimeSpan.FromSeconds(options.Value.RefreshReuseGraceSeconds);
+
+        if (existing.RevokedAt is not null && !benignRace)
         {
             // A rotated token was presented again: assume theft and kill the whole family.
             await refreshTokens.RevokeFamilyAsync(existing.FamilyId, now, cancellationToken);
@@ -101,7 +105,7 @@ public sealed class AuthService(
             throw InvalidRefreshToken();
         }
 
-        if (!existing.IsActive(now))
+        if (existing.ExpiresAt <= now)
         {
             throw InvalidRefreshToken();
         }

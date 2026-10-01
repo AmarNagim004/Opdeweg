@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
@@ -92,19 +93,33 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        var settings = new Dictionary<string, string?>
+        {
+            ["ConnectionStrings:Database"] = _database,
+            ["ConnectionStrings:Redis"] = _redis,
+            ["Database:MigrateOnStartup"] = "true",
+            ["Redis:KeyPrefix"] = _keyPrefix,
+            ["Jwt:Secret"] = "integration-tests-only-secret-0123456789abcdef",
+            ["LiveKit:Url"] = "wss://voice.test",
+            ["LiveKit:ApiKey"] = "testkey",
+            ["LiveKit:ApiSecret"] = "integration-tests-livekit-secret-0123456789",
+            ["RateLimiting:AuthPermitsPerMinute"] = "1000",
+            ["RateLimiting:GlobalPermitsPerMinute"] = "10000",
+            ["RateLimiting:LocationBurst"] = "1000",
+            ["Auth:RefreshReuseGraceSeconds"] = "2",
+            ["Logging:LogLevel:Default"] = "Warning",
+        };
+
         builder.UseEnvironment("Testing");
-        builder.UseSetting("ConnectionStrings:Database", _database);
-        builder.UseSetting("ConnectionStrings:Redis", _redis);
-        builder.UseSetting("Database:MigrateOnStartup", "true");
-        builder.UseSetting("Redis:KeyPrefix", _keyPrefix);
-        builder.UseSetting("Jwt:Secret", "integration-tests-only-secret-0123456789abcdef");
-        builder.UseSetting("LiveKit:Url", "wss://voice.test");
-        builder.UseSetting("LiveKit:ApiKey", "testkey");
-        builder.UseSetting("LiveKit:ApiSecret", "integration-tests-livekit-secret-0123456789");
-        builder.UseSetting("RateLimiting:AuthPermitsPerMinute", "1000");
-        builder.UseSetting("RateLimiting:GlobalPermitsPerMinute", "10000");
-        builder.UseSetting("RateLimiting:LocationBurst", "1000");
-        builder.UseSetting("Logging:LogLevel:Default", "Warning");
+
+        // Minimal hosting reads some values while registering services (host settings) and binds options
+        // later from app configuration, where appsettings.json would otherwise win: set both.
+        foreach (var (key, value) in settings)
+        {
+            builder.UseSetting(key, value);
+        }
+
+        builder.ConfigureAppConfiguration(config => config.AddInMemoryCollection(settings));
 
         builder.ConfigureServices(services =>
         {

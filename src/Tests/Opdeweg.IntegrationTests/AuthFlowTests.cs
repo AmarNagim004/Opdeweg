@@ -21,7 +21,12 @@ public sealed class AuthFlowTests(ApiFactory factory)
         var rotated = (await refreshed.Content.ReadFromJsonAsync<AuthResponse>(ApiFactory.Json))!;
         Assert.NotEqual(driver.Auth.RefreshToken, rotated.RefreshToken);
 
-        // Replaying the old token is treated as theft: it fails and revokes the rotated one too.
+        // An immediate retry with the just-rotated token (lost response, two app contexts) is a benign race.
+        var retry = await anonymous.PostAsJsonAsync("/api/v1/auth/refresh", new { refreshToken = driver.Auth.RefreshToken });
+        retry.EnsureSuccessStatusCode();
+
+        // Replaying it after the grace window is treated as theft: it fails and revokes the whole family.
+        await Task.Delay(TimeSpan.FromSeconds(2.5));
         var replay = await anonymous.PostAsJsonAsync("/api/v1/auth/refresh", new { refreshToken = driver.Auth.RefreshToken });
         Assert.Equal(HttpStatusCode.Unauthorized, replay.StatusCode);
         var afterReuse = await anonymous.PostAsJsonAsync("/api/v1/auth/refresh", new { refreshToken = rotated.RefreshToken });

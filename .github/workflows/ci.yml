@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: opdeweg_test
+          POSTGRES_USER: opdeweg
+          POSTGRES_PASSWORD: opdeweg
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U opdeweg -d opdeweg_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+      redis:
+        image: redis:7.4-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      OPDEWEG_TEST_DATABASE: Host=localhost;Port=5432;Database=opdeweg_test;Username=opdeweg;Password=opdeweg
+      OPDEWEG_TEST_REDIS: localhost:6379,defaultDatabase=15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet restore Opdeweg.slnx
+      - run: dotnet build Opdeweg.slnx --no-restore -c Release
+      - run: dotnet test --project src/Tests/Opdeweg.UnitTests -c Release --no-build
+      - run: dotnet test --project src/Tests/Opdeweg.IntegrationTests -c Release --no-build
+
+  mobile:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Mobile/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test -- --ci

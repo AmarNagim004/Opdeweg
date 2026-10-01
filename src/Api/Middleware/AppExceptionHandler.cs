@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Opdeweg.Application.Common;
 using StackExchange.Redis;
 
@@ -13,6 +15,8 @@ internal sealed partial class AppExceptionHandler(IProblemDetailsService problem
         var (status, code, title) = exception switch
         {
             AppException app => (StatusFor(app.Kind), app.Code, app.Message),
+            DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } } =>
+                (StatusCodes.Status409Conflict, "conflict", "The request conflicts with a concurrent change. Please retry."),
             RedisException or RedisTimeoutException => (StatusCodes.Status503ServiceUnavailable, "presence_unavailable", "Realtime presence is temporarily unavailable."),
             OperationCanceledException when httpContext.RequestAborted.IsCancellationRequested => (499, "client_closed", "The request was cancelled."),
             _ => (StatusCodes.Status500InternalServerError, "internal_error", "Something went wrong."),

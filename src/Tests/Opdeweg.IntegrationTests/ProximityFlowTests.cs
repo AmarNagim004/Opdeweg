@@ -26,8 +26,15 @@ public sealed class ProximityFlowTests(ApiFactory factory)
 
         await using var bobHub = factory.CreateHubConnection(bob.Auth.AccessToken);
         var joined = new TaskCompletionSource<ProximityGroupDto>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var rejoined = new TaskCompletionSource<ProximityGroupDto>(TaskCreationOptions.RunContinuationsAsynchronously);
         var left = new TaskCompletionSource<ProximityGroupLeftDto>(TaskCreationOptions.RunContinuationsAsynchronously);
-        bobHub.On<ProximityGroupDto>("ProximityGroupJoined", g => joined.TrySetResult(g));
+        bobHub.On<ProximityGroupDto>("ProximityGroupJoined", g =>
+        {
+            if (!joined.TrySetResult(g))
+            {
+                rejoined.TrySetResult(g);
+            }
+        });
         bobHub.On<ProximityGroupLeftDto>("ProximityGroupLeft", l => left.TrySetResult(l));
         await bobHub.StartAsync(TestContext.Current.CancellationToken);
 
@@ -65,9 +72,26 @@ public sealed class ProximityFlowTests(ApiFactory factory)
         var leftEvent = await left.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
         Assert.Equal(group.GroupId, leftEvent.GroupId);
 
+        // Bob is re-evaluated right after the dissolve and pushed into a new group with Charlie.
+        var regrouped = await rejoined.Task.WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
+        Assert.NotEqual(group.GroupId, regrouped.GroupId);
+        Assert.Equal("Charlie", Assert.Single(regrouped.Members).DisplayName);
+
         var after = await bob.Http.GetFromJsonAsync<ProximitySnapshotDto>("/api/v1/proximity", ApiFactory.Json, TestContext.Current.CancellationToken);
-        Assert.Equal("Charlie", Assert.Single(after!.Group!.Members).DisplayName);
-        Assert.Contains(RoomNames.ForGroup(group.GroupId), factory.RoomAdmin.Deleted);
+        Assert.Equal(regrouped.GroupId, after!.Group!.GroupId);
+
+        // The dissolved group's SFU room is closed by the background reconciler.
+        await Eventually(() => factory.RoomAdmin.Deleted.Contains(RoomNames.ForGroup(group.GroupId)));
+    }
+
+    private static async Task Eventually(Func<bool> condition, int timeoutMs = 5000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (!condition())
+        {
+            Assert.True(DateTime.UtcNow < deadline, "Condition not met in time.");
+            await Task.Delay(50, TestContext.Current.CancellationToken);
+        }
     }
 
     [Fact]

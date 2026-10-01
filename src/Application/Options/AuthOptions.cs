@@ -11,4 +11,11 @@ public sealed class AuthOptions
 
     [Range(8, 128)]
     public int MinPasswordLength { get; set; } = 8;
+
+    /// <summary>
+    /// A just-rotated refresh token presented again within this window is treated as a benign race
+    /// (lost response + retry, two app contexts refreshing at once) rather than theft.
+    /// </summary>
+    [Range(0, 300)]
+    public int RefreshReuseGraceSeconds { get; set; } = 30;
 }

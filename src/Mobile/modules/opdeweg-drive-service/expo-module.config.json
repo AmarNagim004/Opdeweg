@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["DriveServiceModule"]
+  },
+  "android": {
+    "modules": ["app.opdeweg.driveservice.DriveServiceModule"]
+  }
+}

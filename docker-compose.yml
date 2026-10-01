@@ -1,0 +1,91 @@
+# Local development stack for Opdeweg.
+#   cp .env.example .env   # then fill in the secrets (see docs/CONFIGURATION.md)
+#   docker compose up -d                  # PostgreSQL/PostGIS, Redis, LiveKit
+#   docker compose --profile full up -d   # ...plus the API in a container
+name: opdeweg
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: opdeweg
+      POSTGRES_USER: ${POSTGRES_USER:-opdeweg}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-opdeweg} -d opdeweg"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    # Presence data is ephemeral by design (latest fix only, short TTLs): no persistence.
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  livekit:
+    image: livekit/livekit-server:v1.13.7
+    environment:
+      # Inline config so the API key/secret come from .env and are never committed.
+      LIVEKIT_CONFIG: |
+        port: 7880
+        rtc:
+          tcp_port: 7881
+          port_range_start: 50000
+          port_range_end: 50100
+          use_external_ip: false
+          node_ip: ${LIVEKIT_NODE_IP:-127.0.0.1}
+        keys:
+          ${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET in .env}
+        webhook:
+          api_key: ${LIVEKIT_API_KEY:-devkey}
+          urls:
+            - ${LIVEKIT_WEBHOOK_URL:-http://host.docker.internal:5080/api/v1/livekit/webhook}
+        room:
+          empty_timeout: 60
+          departure_timeout: 20
+        logging:
+          level: info
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "50000-50100:50000-50100/udp"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  api:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DATABASE_CONNECTION_STRING: Host=postgres;Port=5432;Database=opdeweg;Username=${POSTGRES_USER:-opdeweg};Password=${POSTGRES_PASSWORD}
+      REDIS_CONNECTION_STRING: redis:6379
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      LIVEKIT_URL: ${LIVEKIT_URL:-ws://localhost:7880}
+      LIVEKIT_API_URL: http://livekit:7880
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:-devkey}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
+    ports:
+      - "5080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      livekit:
+        condition: service_started
+
+volumes:
+  pgdata:

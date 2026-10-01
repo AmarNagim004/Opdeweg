@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -113,6 +114,19 @@ builder.Services.AddSingleton<HubRateLimitFilter>();
 builder.Services.AddSingleton<IUserIdProvider, SubjectUserIdProvider>();
 builder.Services.AddSingleton<IRealtimeNotifier, SignalRRealtimeNotifier>();
 
+// ---- Reverse proxy (TLS termination) ----
+var behindProxy = builder.Configuration.GetValue("ForwardedHeaders:Enabled", false);
+if (behindProxy)
+{
+    // Only enable when the API is reachable exclusively through a trusted load balancer.
+    builder.Services.Configure<ForwardedHeadersOptions>(o =>
+    {
+        o.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        o.KnownIPNetworks.Clear();
+        o.KnownProxies.Clear();
+    });
+}
+
 // ---- Health ----
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AppDbContext>("postgres", tags: ["ready"])
@@ -124,6 +138,11 @@ if (app.Configuration.GetValue("Database:MigrateOnStartup", app.Environment.IsDe
 {
     await using var scope = app.Services.CreateAsyncScope();
     await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
+}
+
+if (behindProxy)
+{
+    app.UseForwardedHeaders();
 }
 
 app.UseExceptionHandler();

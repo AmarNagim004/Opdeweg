@@ -1,0 +1,8 @@
+**/bin
+**/obj
+**/node_modules
+src/Mobile
+src/Tests
+.git
+.env
+.env.*
