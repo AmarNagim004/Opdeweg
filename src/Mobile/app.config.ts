@@ -58,6 +58,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       'android.permission.POST_NOTIFICATIONS',
       'android.permission.BLUETOOTH_CONNECT',
       'android.permission.WAKE_LOCK',
+      // expo-task-manager persists the background-location job; Android rejects that without this.
+      'android.permission.RECEIVE_BOOT_COMPLETED',
       'android.permission.INTERNET',
       'android.permission.ACCESS_NETWORK_STATE',
     ],
