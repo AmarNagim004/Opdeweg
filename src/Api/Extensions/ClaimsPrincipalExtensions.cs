@@ -9,5 +9,5 @@ internal static class ClaimsPrincipalExtensions
         Guid.TryParse(principal.FindFirstValue("sub"), out var id) ? id : null;
 
     public static Guid GetUserId(this ClaimsPrincipal principal) =>
-        principal.GetUserIdOrNull() ?? throw AppException.Unauthorized("unauthenticated", "Sign in to continue.");
+        principal.GetUserIdOrNull() ?? throw AppException.Unauthorized("unauthenticated", "Log in om verder te gaan.");
 }

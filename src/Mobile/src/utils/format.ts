@@ -1,7 +1,7 @@
-/** Approximate, privacy-friendly distance: "< 50 m", "420 m", "1.1 km". */
+/** Geschatte, privacyvriendelijke afstand in Nederlandse notatie: "< 50 m", "420 m", "1 km", "1,1 km". */
 export function formatDistance(meters: number | null | undefined): string {
   if (meters == null) {
-    return 'nearby';
+    return 'dichtbij';
   }
 
   if (meters < 50) {
@@ -12,26 +12,23 @@ export function formatDistance(meters: number | null | undefined): string {
     return `${Math.round(meters / 10) * 10} m`;
   }
 
-  return `${(meters / 1000).toFixed(1)} km`;
+  return `${(meters / 1000).toFixed(1).replace(/\.0$/, '').replace('.', ',')} km`;
 }
 
-export function formatElapsed(fromIso: string | null | undefined, now = Date.now()): string {
-  if (!fromIso) {
-    return '';
-  }
+/** Whole minutes elapsed since an ISO timestamp (never negative). */
+export function minutesSince(fromIso: string | null | undefined, now = Date.now()): number {
+  return fromIso ? Math.max(0, Math.floor((now - Date.parse(fromIso)) / 60_000)) : 0;
+}
 
-  const minutes = Math.max(0, Math.floor((now - Date.parse(fromIso)) / 60_000));
-  if (minutes < 1) {
-    return 'just now';
-  }
-
+/** Ritduur: "12 min", "2 uur", "2 uur 15 min". */
+export function formatElapsedMinutes(minutes: number): string {
   if (minutes < 60) {
     return `${minutes} min`;
   }
 
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
-  return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+  return rest === 0 ? `${hours} uur` : `${hours} uur ${rest} min`;
 }
 
 export function initials(name: string): string {
@@ -55,8 +52,4 @@ export function avatarHue(id: string): number {
   }
 
   return AVATAR_HUES[Math.abs(hash) % AVATAR_HUES.length] ?? 200;
-}
-
-export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
-  return `${count} ${count === 1 ? singular : plural}`;
 }

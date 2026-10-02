@@ -1,4 +1,5 @@
 using System.Globalization;
+using Opdeweg.Application.Features.Driving;
 using Opdeweg.Application.Features.Proximity;
 using Opdeweg.Application.Interfaces;
 using Opdeweg.Domain.ValueObjects;
@@ -265,7 +266,7 @@ internal sealed class RedisPresenceStore(IConnectionMultiplexer redis, RedisKeys
             sessionId,
             userId,
             handle.ToString(),
-            map.TryGetValue("name", out var name) ? name.ToString() : "Driver",
+            map.TryGetValue("name", out var name) ? name.ToString() : DrivingSessionService.AnonymousName,
             map.TryGetValue("av", out var avatar) ? avatar.ToString() : null,
             DateTimeOffset.FromUnixTimeMilliseconds((long)started),
             map.TryGetValue("grp", out var group) ? group.ToString() : null,

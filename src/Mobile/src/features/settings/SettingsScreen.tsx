@@ -14,14 +14,20 @@ import { setSpeakerOutput, showAudioRoutePicker, supportsRoutePicker } from '../
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore, type ThemePreference } from '../../store/uiStore';
 import { useVoiceStore } from '../../store/voiceStore';
-import { formatDistance } from '../../utils/format';
+import { t } from '../../i18n/nl';
 import { authController } from '../auth/authController';
 import { EditNameModal } from './components/EditNameModal';
 import { SettingsRow } from './components/SettingsRow';
 import type { RootStackParamList } from '../../navigation/types';
 
 const permissionLabel = (status: PermissionStatus | undefined): [string, 'accent' | 'danger' | 'muted'] =>
-  status === 'granted' ? ['Allowed', 'accent'] : status === 'denied' ? ['Denied', 'danger'] : status === 'notApplicable' ? ['Not needed', 'muted'] : ['Not set', 'muted'];
+  status === 'granted'
+    ? [t.settings.permissionGranted, 'accent']
+    : status === 'denied'
+      ? [t.settings.permissionDenied, 'danger']
+      : status === 'notApplicable'
+        ? [t.settings.permissionNotNeeded, 'muted']
+        : [t.settings.permissionNotSet, 'muted'];
 
 export function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -41,23 +47,23 @@ export function SettingsScreen() {
     try {
       await authController.updateProfile({ shareDisplayName: share });
     } catch {
-      Alert.alert('Couldn’t update privacy setting', 'Please try again when you’re online.');
+      Alert.alert(t.settings.updateFailed.title, t.settings.updateFailed.body);
     }
   };
 
   const confirmSignOut = () =>
-    Alert.alert('Sign out?', 'Any active drive will end.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out', style: 'destructive', onPress: () => void authController.signOut() },
+    Alert.alert(t.settings.confirmSignOut.title, t.settings.confirmSignOut.body, [
+      { text: t.settings.confirmSignOut.cancel, style: 'cancel' },
+      { text: t.settings.confirmSignOut.confirm, style: 'destructive', onPress: () => void authController.signOut() },
     ]);
 
   const confirmDelete = () =>
-    Alert.alert('Delete account?', 'This permanently deletes your account and all associated data. This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t.settings.confirmDelete.title, t.settings.confirmDelete.body, [
+      { text: t.settings.confirmDelete.cancel, style: 'cancel' },
       {
-        text: 'Delete',
+        text: t.settings.confirmDelete.confirm,
         style: 'destructive',
-        onPress: () => void authController.deleteAccount().catch(() => Alert.alert('Couldn’t delete your account', 'Please try again when you’re online.')),
+        onPress: () => void authController.deleteAccount().catch(() => Alert.alert(t.settings.deleteFailed.title, t.settings.deleteFailed.body)),
       },
     ]);
 
@@ -69,11 +75,11 @@ export function SettingsScreen() {
   return (
     <Screen scroll>
       <AppText variant="title" accessibilityRole="header" style={styles.title}>
-        Settings
+        {t.settings.title}
       </AppText>
 
       <Card style={styles.profile}>
-        <Avatar id={user?.id ?? 'me'} name={user?.displayName ?? 'Driver'} size={56} />
+        <Avatar id={user?.id ?? 'me'} name={user?.displayName ?? t.anonymousName} size={56} />
         <View style={styles.profileText}>
           <AppText variant="headline" numberOfLines={1}>
             {user?.displayName}
@@ -84,38 +90,38 @@ export function SettingsScreen() {
         </View>
       </Card>
 
-      <Section title="Account">
-        <SettingsRow first icon="person-outline" label="Display name" value={user?.displayName} onPress={() => setEditing(true)} />
-        <SettingsRow icon="log-out-outline" label="Sign out" onPress={confirmSignOut} />
+      <Section title={t.settings.account}>
+        <SettingsRow first icon="person-outline" label={t.settings.displayName} value={user?.displayName} onPress={() => setEditing(true)} />
+        <SettingsRow icon="log-out-outline" label={t.settings.signOut} onPress={confirmSignOut} />
       </Section>
 
-      <Section title="Privacy">
-        <SettingsRow first icon="eye-outline" label="Show my name to nearby drivers" toggle={{ value: user?.shareDisplayName ?? true, onChange: (v) => void toggleShareName(v) }}>
+      <Section title={t.settings.privacy}>
+        <SettingsRow first icon="eye-outline" label={t.settings.shareName} toggle={{ value: user?.shareDisplayName ?? true, onChange: (v) => void toggleShareName(v) }}>
           <AppText variant="caption" tone="muted">
-            When off, others see “Driver”.
+            {t.settings.shareNameHint}
           </AppText>
         </SettingsRow>
-        <SettingsRow icon="shield-checkmark-outline" label="How your location is used">
+        <SettingsRow icon="shield-checkmark-outline" label={t.settings.locationUse}>
           <AppText variant="caption" tone="muted">
-            Shared only during a drive, never as exact coordinates. Others see a rounded distance. No route history is stored.
+            {t.settings.locationUseBody}
           </AppText>
         </SettingsRow>
       </Section>
 
-      <Section title="Permissions">
-        <SettingsRow first icon="location-outline" label="Location" value={loc} valueTone={locTone} onPress={() => navigation.navigate('Permissions')} />
-        <SettingsRow icon="moon-outline" label="Background location" value={bg} valueTone={bgTone} onPress={() => void openAppSettings()} />
-        <SettingsRow icon="mic-outline" label="Microphone" value={mic} valueTone={micTone} onPress={() => navigation.navigate('Permissions')} />
+      <Section title={t.settings.permissions}>
+        <SettingsRow first icon="location-outline" label={t.settings.location} value={loc} valueTone={locTone} onPress={() => navigation.navigate('Permissions')} />
+        <SettingsRow icon="moon-outline" label={t.settings.backgroundLocation} value={bg} valueTone={bgTone} onPress={() => void openAppSettings()} />
+        <SettingsRow icon="mic-outline" label={t.settings.microphone} value={mic} valueTone={micTone} onPress={() => navigation.navigate('Permissions')} />
         {permissions?.bluetooth !== 'notApplicable' ? (
-          <SettingsRow icon="bluetooth-outline" label="Nearby devices (Bluetooth)" value={bt} valueTone={btTone} onPress={() => void openAppSettings()} />
+          <SettingsRow icon="bluetooth-outline" label={t.settings.bluetooth} value={bt} valueTone={btTone} onPress={() => void openAppSettings()} />
         ) : null}
       </Section>
 
-      <Section title="Audio">
+      <Section title={t.settings.audio}>
         <SettingsRow
           first
           icon="volume-high-outline"
-          label="Use loudspeaker"
+          label={t.settings.useSpeaker}
           toggle={{
             value: output === 'speaker',
             onChange: (speaker) => {
@@ -125,47 +131,47 @@ export function SettingsScreen() {
           }}
         >
           <AppText variant="caption" tone="muted">
-            Off: car Bluetooth, intercoms and headphones are used automatically.
+            {t.settings.useSpeakerHint}
           </AppText>
         </SettingsRow>
-        {supportsRoutePicker ? <SettingsRow icon="headset-outline" label="Choose audio device" onPress={() => void showAudioRoutePicker()} /> : null}
+        {supportsRoutePicker ? <SettingsRow icon="headset-outline" label={t.settings.chooseAudioDevice} onPress={() => void showAudioRoutePicker()} /> : null}
       </Section>
 
-      <Section title="Voice">
-        <SettingsRow first icon="mic-off-outline" label="Start drives muted" toggle={{ value: ui.startMuted, onChange: ui.setStartMuted }} />
-        <SettingsRow icon="phone-portrait-outline" label="Keep screen on while driving" toggle={{ value: ui.keepScreenAwake, onChange: ui.setKeepScreenAwake }} />
+      <Section title={t.settings.voice}>
+        <SettingsRow first icon="mic-off-outline" label={t.settings.startMuted} toggle={{ value: ui.startMuted, onChange: ui.setStartMuted }} />
+        <SettingsRow icon="phone-portrait-outline" label={t.settings.keepAwake} toggle={{ value: ui.keepScreenAwake, onChange: ui.setKeepScreenAwake }} />
       </Section>
 
-      <Section title="Location & distance">
-        <SettingsRow first icon="git-network-outline" label="Voice range">
+      <Section title={t.settings.locationAndRange}>
+        <SettingsRow first icon="git-network-outline" label={t.settings.range}>
           <AppText variant="caption" tone="muted">
-            Join within {formatDistance(join)} · leave beyond {formatDistance(leave)}. The gap prevents flickering at the edge.
+            {t.settings.rangeBody(join, leave)}
           </AppText>
         </SettingsRow>
-        <SettingsRow icon="speedometer-outline" label="Update frequency">
+        <SettingsRow icon="speedometer-outline" label={t.settings.updateFrequency}>
           <AppText variant="caption" tone="muted">
-            Every {step} m moved or {interval} s — never continuously.
+            {t.settings.updateFrequencyBody(step, interval)}
           </AppText>
         </SettingsRow>
       </Section>
 
-      <Section title="Appearance">
+      <Section title={t.settings.appearance}>
         <View style={styles.segment}>
           <SegmentedControl<ThemePreference>
             value={ui.themePreference}
             onChange={ui.setThemePreference}
             options={[
-              { value: 'system', label: 'System' },
-              { value: 'dark', label: 'Dark' },
-              { value: 'light', label: 'Light' },
+              { value: 'system', label: t.settings.system },
+              { value: 'dark', label: t.settings.dark },
+              { value: 'light', label: t.settings.light },
             ]}
           />
         </View>
       </Section>
 
-      <Section title="About">
+      <Section title={t.settings.about}>
         <SettingsRow first icon="information-circle-outline" label="Opdeweg" value={`v${Constants.expoConfig?.version ?? '0.0.0'}`} />
-        <SettingsRow icon="trash-outline" label="Delete account" destructive onPress={confirmDelete} />
+        <SettingsRow icon="trash-outline" label={t.settings.deleteAccount} destructive onPress={confirmDelete} />
       </Section>
 
       <EditNameModal visible={editing} initial={user?.displayName ?? ''} onClose={() => setEditing(false)} />

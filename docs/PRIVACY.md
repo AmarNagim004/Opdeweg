@@ -20,7 +20,7 @@ No location history or route trail is stored anywhere. Redis runs without persis
 ## What other drivers learn
 
 - A **per-session pseudonym** (`d1a2b…`) — not your account ID; it changes every drive.
-- Your display name, or "Driver" if you turned *Show my name* off (avatar hidden too).
+- Your display name, or "Rijder" if you turned *Laat mijn naam zien* off (avatar hidden too).
 - A distance **rounded to 50 m**, computed server-side. Never coordinates, heading or speed.
 - Only drivers who are themselves nearby and driving receive anything.
 

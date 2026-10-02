@@ -39,6 +39,7 @@ builder.Services
             var result = defaultFactory(context);
             if (result is ObjectResult { Value: ProblemDetails problem })
             {
+                problem.Title = "Niet alles is goed ingevuld.";
                 problem.Extensions["code"] = "validation_failed";
             }
 

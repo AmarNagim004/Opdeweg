@@ -36,7 +36,7 @@ public sealed class AuthService(
 
         if (await users.EmailExistsAsync(email, cancellationToken))
         {
-            throw AppException.Conflict("email_taken", "An account with this e-mail already exists.");
+            throw AppException.Conflict("email_taken", "Er is al een account met dit e-mailadres.");
         }
 
         var now = time.GetUtcNow();
@@ -151,8 +151,8 @@ public sealed class AuthService(
     }
 
     private static AppException InvalidCredentials() =>
-        AppException.Unauthorized("invalid_credentials", "E-mail or password is incorrect.");
+        AppException.Unauthorized("invalid_credentials", "E-mail of wachtwoord klopt niet.");
 
     private static AppException InvalidRefreshToken() =>
-        AppException.Unauthorized("invalid_refresh_token", "Your session has expired. Please sign in again.");
+        AppException.Unauthorized("invalid_refresh_token", "Je sessie is verlopen. Log even opnieuw in.");
 }

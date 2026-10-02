@@ -33,8 +33,8 @@ class DriveForegroundService : Service() {
       return START_NOT_STICKY
     }
 
-    val title = intent?.getStringExtra(EXTRA_TITLE) ?: "Driving"
-    val body = intent?.getStringExtra(EXTRA_BODY) ?: "Sharing your approximate position with nearby drivers."
+    val title = intent?.getStringExtra(EXTRA_TITLE) ?: "Onderweg"
+    val body = intent?.getStringExtra(EXTRA_BODY) ?: "Je deelt je geschatte locatie met rijders in de buurt."
     ensureChannel()
 
     try {
@@ -74,8 +74,8 @@ class DriveForegroundService : Service() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
     val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     if (manager.getNotificationChannel(CHANNEL_ID) == null) {
-      val channel = NotificationChannel(CHANNEL_ID, "Driving session", NotificationManager.IMPORTANCE_LOW).apply {
-        description = "Shown while Opdeweg shares your position and voice with nearby drivers."
+      val channel = NotificationChannel(CHANNEL_ID, "Tijdens je rit", NotificationManager.IMPORTANCE_LOW).apply {
+        description = "Zie je zolang Opdeweg je locatie en spraak deelt met rijders in de buurt."
         setShowBadge(false)
       }
       manager.createNotificationChannel(channel)

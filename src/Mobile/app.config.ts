@@ -2,12 +2,13 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 const IS_DEV = process.env.APP_VARIANT === 'development';
 
+// The app ships Dutch only (copy deck: src/i18n/nl.ts). Keep these in the same tone: spreektaal, je/jij.
 const LOCATION_WHEN_IN_USE =
-  'Opdeweg uses your location during a drive to connect you with drivers within about 1 km. Other drivers only see a rounded distance, never your position.';
+  'Opdeweg gebruikt je locatie tijdens je rit om je te koppelen aan rijders binnen zo’n 1 km. Andere rijders zien alleen een afgeronde afstand, nooit waar je precies bent.';
 const LOCATION_ALWAYS =
-  'Allow background location so Opdeweg keeps you connected with nearby drivers while your phone is locked during a drive. Tracking stops when you end the drive.';
+  'Kies ‘Altijd toestaan’, dan blijf je ook met je scherm uit verbonden met rijders in de buurt. Stop je je rit? Dan stopt Opdeweg ook met je locatie.';
 const MICROPHONE =
-  'Opdeweg uses the microphone so you can talk with drivers near you. It is only live while you are in a nearby voice channel, and you can mute at any time.';
+  'Opdeweg gebruikt je microfoon zodat je kunt praten met rijders in de buurt. Hij staat alleen live als je in een kanaal zit, en met één tik zet je hem op stil.';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
@@ -31,6 +32,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       // Development builds talk to a local API over plain HTTP; release builds enforce HTTPS at runtime.
       NSAppTransportSecurity: { NSAllowsLocalNetworking: true },
       ITSAppUsesNonExemptEncryption: false,
+      // Dutch-only app: system UI inside the app (permission buttons, share sheets) follows suit.
+      CFBundleDevelopmentRegion: 'nl',
+      CFBundleLocalizations: ['nl'],
     },
   },
   android: {
@@ -85,7 +89,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ['@livekit/react-native-expo-plugin', { android: { audioType: 'communication' } }],
     [
       '@config-plugins/react-native-webrtc',
-      { microphonePermission: MICROPHONE, cameraPermission: 'Opdeweg is audio-only and does not use the camera.' },
+      { microphonePermission: MICROPHONE, cameraPermission: 'Opdeweg gebruikt je camera niet: de app doet alleen geluid.' },
     ],
     ['expo-build-properties', { android: { minSdkVersion: 26, usesCleartextTraffic: IS_DEV }, ios: { deploymentTarget: '16.4' } }],
   ],

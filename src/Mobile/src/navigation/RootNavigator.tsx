@@ -20,6 +20,7 @@ function AuthNavigator() {
       screenOptions={{
         headerShadowVisible: false,
         headerTitle: '',
+        headerBackButtonDisplayMode: 'minimal',
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.text,
         contentStyle: { backgroundColor: colors.background },

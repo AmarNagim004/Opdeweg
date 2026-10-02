@@ -5,23 +5,24 @@ import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
 import { Screen } from '../../components/Screen';
 import { TextField } from '../../components/TextField';
+import { t } from '../../i18n/nl';
 import { ApiError } from '../../services/api/http';
 import { authController } from './authController';
 
 const friendlyError = (error: unknown): string => {
   if (!(error instanceof ApiError)) {
-    return 'Something went wrong. Please try again.';
+    return t.auth.errors.generic;
   }
 
   switch (error.code) {
     case 'network_error':
-      return 'Can’t reach Opdeweg. Check your connection.';
+      return t.auth.errors.network;
     case 'invalid_credentials':
-      return 'E-mail or password is incorrect.';
+      return t.auth.errors.invalidCredentials;
     case 'email_taken':
-      return 'An account with this e-mail already exists.';
+      return t.auth.errors.emailTaken;
     case 'rate_limited':
-      return 'Too many attempts. Wait a minute and try again.';
+      return t.auth.errors.rateLimited;
     default:
       return error.message;
   }
@@ -62,15 +63,15 @@ export function AuthForm({ mode }: { mode: 'signIn' | 'signUp' }) {
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Screen scroll edges={['bottom']} contentStyle={styles.content}>
-        <AppText variant="title">{signUp ? 'Create your account' : 'Welcome back'}</AppText>
-        <AppText tone="muted">{signUp ? 'Pick the name nearby drivers will see. You can hide it later.' : 'Sign in to continue driving.'}</AppText>
+        <AppText variant="title">{signUp ? t.auth.signUpTitle : t.auth.signInTitle}</AppText>
+        <AppText tone="muted">{signUp ? t.auth.signUpBody : t.auth.signInBody}</AppText>
 
         {error ? <Banner tone="danger" icon="alert-circle-outline" title={error} /> : null}
 
         <View style={styles.fields}>
           {signUp ? (
             <TextField
-              label="Display name"
+              label={t.auth.name}
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
@@ -82,7 +83,7 @@ export function AuthForm({ mode }: { mode: 'signIn' | 'signUp' }) {
           ) : null}
           <TextField
             ref={emailRef}
-            label="E-mail"
+            label={t.auth.email}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -94,7 +95,7 @@ export function AuthForm({ mode }: { mode: 'signIn' | 'signUp' }) {
           />
           <TextField
             ref={passwordRef}
-            label="Password"
+            label={t.auth.password}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -105,12 +106,12 @@ export function AuthForm({ mode }: { mode: 'signIn' | 'signUp' }) {
           />
           {signUp ? (
             <AppText variant="caption" tone="muted">
-              At least 8 characters.
+              {t.auth.passwordHint}
             </AppText>
           ) : null}
         </View>
 
-        <Button label={signUp ? 'Create account' : 'Sign in'} onPress={() => void submit()} loading={busy} disabled={!valid} />
+        <Button label={signUp ? t.auth.signUp : t.auth.signIn} onPress={() => void submit()} loading={busy} disabled={!valid} />
       </Screen>
     </KeyboardAvoidingView>
   );

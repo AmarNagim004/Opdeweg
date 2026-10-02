@@ -25,8 +25,8 @@ public sealed record LocationVerdict(LocationVerdictOutcome Outcome, GeoPoint? P
     public AppException ToException() => Reason switch
     {
         LocationRejectionReasons.ImplausibleMovement or LocationRejectionReasons.OutOfOrder =>
-            AppException.Unprocessable(Reason, "The location update was rejected."),
-        _ => AppException.Validation(Reason ?? "invalid_location", "The location update is invalid."),
+            AppException.Unprocessable(Reason, "Deze locatie-update is geweigerd."),
+        _ => AppException.Validation(Reason ?? "invalid_location", "Deze locatie-update klopt niet."),
     };
 }
 

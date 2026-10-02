@@ -3,6 +3,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppText } from '../../../components/AppText';
 import { Avatar } from '../../../components/Avatar';
 import { useTheme } from '../../../theme/ThemeProvider';
+import { t } from '../../../i18n/nl';
 import { formatDistance } from '../../../utils/format';
 import type { NearbyDriver } from '../../../types/api';
 
@@ -14,7 +15,7 @@ export function DriverRow({ driver, speaking }: { driver: NearbyDriver; speaking
     <View
       style={styles.row}
       accessible
-      accessibilityLabel={`${driver.displayName}, about ${distance} away${driver.inVoiceGroup ? ', in your voice channel' : ''}${speaking ? ', speaking' : ''}`}
+      accessibilityLabel={t.nearby.rowA11y(driver.displayName, distance, driver.inVoiceGroup, speaking)}
     >
       <Avatar id={driver.id} name={driver.displayName} size={44} speaking={speaking} dimmed={!driver.inVoiceGroup} />
       <View style={styles.text}>
@@ -22,7 +23,7 @@ export function DriverRow({ driver, speaking }: { driver: NearbyDriver; speaking
           {driver.displayName}
         </AppText>
         <AppText variant="caption" tone={speaking ? 'accent' : 'muted'}>
-          {speaking ? 'Speaking' : driver.inVoiceGroup ? 'In your channel' : 'Nearby · other channel'}
+          {speaking ? t.nearby.speaking : driver.inVoiceGroup ? t.nearby.inChannel : t.nearby.otherChannel}
         </AppText>
       </View>
       <View style={styles.distance}>

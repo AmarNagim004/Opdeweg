@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppText } from '../../../components/AppText';
 import { ScalePressable } from '../../../components/Pressable';
+import { t } from '../../../i18n/nl';
 import { setSpeakerOutput } from '../../../services/voice/audioSession';
 import { useVoiceStore } from '../../../store/voiceStore';
 import { useTheme } from '../../../theme/ThemeProvider';
@@ -27,15 +28,15 @@ export function VoiceControls({ compact = false }: { compact?: boolean }) {
         <ScalePressable
           onPress={() => void voiceController.setMuted(!muted)}
           accessibilityRole="switch"
-          accessibilityLabel="Microphone"
+          accessibilityLabel={t.controls.micA11y}
           accessibilityState={{ checked: !muted }}
-          accessibilityHint={muted ? 'Unmutes your microphone' : 'Mutes your microphone'}
+          accessibilityHint={muted ? t.controls.micUnmuteHint : t.controls.micMuteHint}
           style={[styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: muted ? colors.danger : colors.surfaceRaised, borderColor: muted ? colors.danger : colors.border }]}
         >
           <Ionicons name={muted ? 'mic-off' : 'mic'} size={size * 0.42} color={muted ? colors.onDanger : colors.text} />
         </ScalePressable>
         <AppText variant="label" tone={muted ? 'danger' : 'muted'}>
-          {muted ? 'Muted' : 'Mic on'}
+          {muted ? t.controls.micMuted : t.controls.micOn}
         </AppText>
       </View>
 
@@ -43,15 +44,15 @@ export function VoiceControls({ compact = false }: { compact?: boolean }) {
         <ScalePressable
           onPress={toggleOutput}
           accessibilityRole="switch"
-          accessibilityLabel="Loudspeaker"
+          accessibilityLabel={t.controls.speakerA11y}
           accessibilityState={{ checked: output === 'speaker' }}
-          accessibilityHint="Switches between the loudspeaker and automatic routing to Bluetooth or headphones"
+          accessibilityHint={t.controls.speakerHint}
           style={[styles.circle, { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
         >
           <Ionicons name={output === 'speaker' ? 'volume-high' : 'bluetooth'} size={size * 0.4} color={colors.text} />
         </ScalePressable>
         <AppText variant="label" tone="muted">
-          {output === 'speaker' ? 'Speaker' : 'Auto audio'}
+          {output === 'speaker' ? t.controls.speaker : t.controls.automatic}
         </AppText>
       </View>
     </View>

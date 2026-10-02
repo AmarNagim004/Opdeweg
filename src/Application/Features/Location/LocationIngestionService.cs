@@ -32,7 +32,7 @@ public sealed class LocationIngestionService(
     {
         var now = time.GetUtcNow();
         var session = await store.GetSessionAsync(userId, cancellationToken)
-            ?? throw AppException.Conflict("no_active_session", "Start a driving session before sharing your location.");
+            ?? throw AppException.Conflict("no_active_session", "Start eerst je rit, dan kun je je locatie delen.");
 
         var previous = await store.GetPositionAsync(userId, cancellationToken);
         var verdict = validator.Validate(request, previous, now);

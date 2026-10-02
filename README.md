@@ -1,6 +1,6 @@
 # Opdeweg
 
-**Talk to the road.** Opdeweg is a cross-platform (iOS + Android) proximity voice app for car and
+**Samen op de weg.** Opdeweg is a cross-platform (iOS + Android) proximity voice app for car and
 motorcycle drivers. Start a drive and you are automatically placed in a voice channel with drivers
 within ~1 km; drive apart and you leave it again. No channels to browse, nothing to tap while moving.
 
@@ -26,9 +26,12 @@ React Native (Expo dev build) ──WebRTC──▶ LiveKit SFU
 - **Built for locked phones.** Native background location (no JS timers), an Android foreground service
   typed `location|microphone`, iOS `location` + `audio` background modes, Bluetooth/car/intercom routing.
 - **Private by design.** Only the latest fix is kept (in Redis, with TTLs); other drivers see a per-session
-  pseudonym, a display name (or "Driver") and a distance rounded to 50 m — never coordinates.
+  pseudonym, a display name (or "Rijder") and a distance rounded to 50 m — never coordinates.
 - **"Night Road" theme.** Asphalt neutrals with a signal-lime accent, dark and light modes, large
   glanceable controls.
+- **Dutch, the way drivers talk.** The whole UI is Dutch spreektaal (je/jij, "rit", "rijders in de buurt",
+  "Altijd toestaan"), modelled on the tone of apps like Flitsmeister. All copy lives in one typed file,
+  `src/Mobile/src/i18n/nl.ts`; API error messages are Dutch too (error `code`s stay stable English ids).
 
 ## Repository layout
 

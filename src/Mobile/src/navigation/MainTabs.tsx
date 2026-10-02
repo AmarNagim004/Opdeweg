@@ -5,6 +5,7 @@ import { NearbyScreen } from '../features/proximity/NearbyScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { VoiceScreen } from '../features/voice/VoiceScreen';
 import { useJourney } from '../hooks/useJourney';
+import { t } from '../i18n/nl';
 import { useTheme } from '../theme/ThemeProvider';
 import type { MainTabParamList } from './types';
 
@@ -17,6 +18,13 @@ const icons: Record<keyof MainTabParamList, [keyof typeof Ionicons.glyphMap, key
   Settings: ['settings', 'settings-outline'],
 };
 
+const labels: Record<keyof MainTabParamList, string> = {
+  Drive: t.tabs.drive,
+  Nearby: t.tabs.nearby,
+  Voice: t.tabs.voice,
+  Settings: t.tabs.settings,
+};
+
 export function MainTabs() {
   const { colors } = useTheme();
   const journey = useJourney();
@@ -25,6 +33,7 @@ export function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        title: labels[route.name],
         tabBarActiveTintColor: colors.accentText,
         tabBarInactiveTintColor: colors.textFaint,
         tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.border, height: 88, paddingTop: 10 },

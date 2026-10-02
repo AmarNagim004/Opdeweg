@@ -7,7 +7,7 @@ import { StatusDot } from '../../components/StatusDot';
 import { useJourney } from '../../hooks/useJourney';
 import { useVoiceStore } from '../../store/voiceStore';
 import { useTheme } from '../../theme/ThemeProvider';
-import { pluralize } from '../../utils/format';
+import { t } from '../../i18n/nl';
 import { drivingController } from '../driving/drivingController';
 import { VoiceControls } from '../driving/components/VoiceControls';
 import { SpeakerStage } from './components/SpeakerStage';
@@ -23,29 +23,29 @@ export function VoiceScreen() {
   const live = journey.voice === 'live';
 
   const [title, subtitle] = !journey.driving
-    ? ['Voice is off', 'Start a drive to talk to drivers nearby']
+    ? [t.voice.offTitle, t.voice.offBody]
     : speaker
-      ? [speaker.name, 'Speaking']
+      ? [speaker.name, t.voice.speaking]
       : live
-        ? [localSpeaking && !muted ? 'You' : 'Quiet road', localSpeaking && !muted ? 'Speaking' : `${pluralize(participants.length, 'driver')} listening`]
+        ? [localSpeaking && !muted ? t.voice.you : t.voice.quietTitle, localSpeaking && !muted ? t.voice.speaking : t.voice.listening(participants.length)]
         : journey.voice === 'standby'
-          ? ['Standing by', 'You’ll be connected when drivers are near']
-          : ['Connecting…', 'Joining nearby voice'];
+          ? [t.voice.standbyTitle, t.voice.standbyBody]
+          : [t.voice.connectingTitle, t.voice.connectingBody];
 
   const chip = {
-    off: ['Off', colors.textFaint],
-    standby: ['Standby', colors.textFaint],
-    connecting: ['Connecting', colors.warning],
-    live: ['Live', colors.accent],
-    reconnecting: ['Reconnecting', colors.warning],
-    retrying: ['Retrying', colors.warning],
+    off: [t.voiceState.off, colors.textFaint],
+    standby: [t.voiceState.standby, colors.textFaint],
+    connecting: [t.voiceState.connecting, colors.warning],
+    live: [t.voiceState.live, colors.accent],
+    reconnecting: [t.voiceState.reconnecting, colors.warning],
+    retrying: [t.voiceState.retrying, colors.warning],
   }[journey.voice] as [string, string];
 
   return (
     <Screen>
       <View style={styles.header}>
         <AppText variant="title" accessibilityRole="header">
-          Nearby voice
+          {t.voice.title}
         </AppText>
         <View style={[styles.chip, { backgroundColor: colors.surface, borderRadius: radius.pill }]}>
           <StatusDot color={chip[1]} size={8} pulse={journey.voice === 'connecting' || journey.voice === 'reconnecting'} />
@@ -58,7 +58,7 @@ export function VoiceScreen() {
       </View>
 
       {live && participants.length > 0 ? (
-        <View style={styles.roster} accessibilityLabel={`${pluralize(participants.length, 'driver')} in channel`}>
+        <View style={styles.roster} accessibilityLabel={t.voice.inChannelA11y(participants.length)}>
           {participants.map((p) => (
             <View key={p.identity} style={styles.person}>
               <Avatar id={p.identity} name={p.name} size={44} speaking={p.isSpeaking} dimmed={p.isMuted} />
@@ -74,13 +74,13 @@ export function VoiceScreen() {
         <View style={styles.bottom}>
           <VoiceControls compact />
           <Button
-            label="End drive"
+            label={t.voice.stopDrive}
             variant="danger"
             icon="stop-circle-outline"
             onPress={() =>
-              Alert.alert('End drive?', 'You’ll leave nearby voice and stop sharing your location.', [
-                { text: 'Keep driving', style: 'cancel' },
-                { text: 'End drive', style: 'destructive', onPress: () => void drivingController.stop() },
+              Alert.alert(t.drive.confirmStop.title, t.drive.confirmStop.body, [
+                { text: t.drive.confirmStop.keepDriving, style: 'cancel' },
+                { text: t.drive.confirmStop.stop, style: 'destructive', onPress: () => void drivingController.stop() },
               ])
             }
           />

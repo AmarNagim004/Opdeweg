@@ -3,7 +3,7 @@ using Opdeweg.Application.Features.Proximity;
 namespace Opdeweg.Application.DTOs;
 
 /// <summary>
-/// What another driver learns about you: a per-session pseudonym, a display name (or "Driver"),
+/// What another driver learns about you: a per-session pseudonym, a display name (or "Rijder"),
 /// and a rounded distance. Never coordinates, never internal IDs.
 /// </summary>
 public sealed record NearbyDriverDto(

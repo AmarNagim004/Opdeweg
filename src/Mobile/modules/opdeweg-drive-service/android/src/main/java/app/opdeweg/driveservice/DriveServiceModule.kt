@@ -10,10 +10,10 @@ import expo.modules.kotlin.records.Record
 
 class DriveNotificationOptions : Record {
   @Field
-  val title: String = "Driving"
+  val title: String = "Onderweg"
 
   @Field
-  val body: String = "Sharing your approximate position with nearby drivers."
+  val body: String = "Je deelt je geschatte locatie met rijders in de buurt."
 }
 
 class DriveServiceModule : Module() {

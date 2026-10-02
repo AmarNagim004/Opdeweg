@@ -15,6 +15,7 @@ import {
   requestMicrophone,
   type PermissionStatus,
 } from '../../services/location/permissions';
+import { t } from '../../i18n/nl';
 import { useUiStore } from '../../store/uiStore';
 import { useTheme } from '../../theme/ThemeProvider';
 
@@ -28,6 +29,12 @@ interface Step {
   request: () => Promise<unknown>;
 }
 
+const allowLabel: Record<Step['key'], string> = {
+  location: t.permissions.allowLocation,
+  microphone: t.permissions.allowMicrophone,
+  background: t.permissions.allowBackground,
+};
+
 /** Explains each permission in plain words before the OS prompt — and why it's safe to grant. */
 export function PermissionsScreen() {
   const { colors } = useTheme();
@@ -40,16 +47,16 @@ export function PermissionsScreen() {
     {
       key: 'location',
       icon: 'location',
-      title: 'Location while driving',
-      body: 'Finds drivers within 1 km. Only used during a drive; others see a rounded distance, never your position.',
+      title: t.permissions.locationTitle,
+      body: t.permissions.locationBody,
       status: permissions?.location,
       request: requestForegroundLocation,
     },
     {
       key: 'microphone',
       icon: 'mic',
-      title: 'Microphone',
-      body: 'Live only when drivers are near you. Mute any time with one tap.',
+      title: t.permissions.micTitle,
+      body: t.permissions.micBody,
       status: permissions?.microphone,
       request: async () => {
         await requestMicrophone();
@@ -59,8 +66,8 @@ export function PermissionsScreen() {
     {
       key: 'background',
       icon: 'moon',
-      title: Platform.OS === 'ios' ? 'Keep working when locked' : 'Allow all the time',
-      body: 'Recommended: keeps you connected with the screen off, even if the system restarts the app.',
+      title: Platform.OS === 'ios' ? t.permissions.backgroundTitleIos : t.permissions.backgroundTitleAndroid,
+      body: t.permissions.backgroundBody,
       status: permissions?.backgroundLocation,
       optional: true,
       request: requestBackgroundLocation,
@@ -95,9 +102,9 @@ export function PermissionsScreen() {
   return (
     <Screen scroll edges={['top', 'bottom']}>
       <AppText variant="title" accessibilityRole="header" style={styles.title}>
-        Set up for the road
+        {t.permissions.title}
       </AppText>
-      <AppText tone="muted">Three quick permissions so Opdeweg can work hands-free.</AppText>
+      <AppText tone="muted">{t.permissions.body}</AppText>
 
       {steps.map((step) => {
         const granted = step.status === 'granted';
@@ -109,7 +116,7 @@ export function PermissionsScreen() {
             <View style={styles.stepText}>
               <AppText variant="bodyStrong">
                 {step.title}
-                {step.optional ? <AppText variant="caption" tone="muted">{'  '}optional</AppText> : null}
+                {step.optional ? <AppText variant="caption" tone="muted">{'  '}{t.permissions.optional}</AppText> : null}
               </AppText>
               <AppText variant="caption" tone="muted">
                 {step.body}
@@ -121,13 +128,13 @@ export function PermissionsScreen() {
 
       <View style={styles.actions}>
         <Button
-          label={!next ? 'Done' : blocked ? 'Open Settings' : `Allow ${next.key === 'background' ? 'background' : next.key}`}
+          label={!next ? t.permissions.done : blocked ? t.permissions.openSettings : allowLabel[next.key]}
           icon={!next ? 'checkmark' : blocked ? 'settings-outline' : 'arrow-forward'}
           onPress={() => void onContinue()}
           loading={busy}
         />
-        {next?.optional || (requiredDone && next) ? <Button label="Not now" variant="ghost" onPress={() => navigation.goBack()} /> : null}
-        {!requiredDone ? <Button label="Later" variant="ghost" onPress={() => navigation.goBack()} /> : null}
+        {next?.optional || (requiredDone && next) ? <Button label={t.permissions.notNow} variant="ghost" onPress={() => navigation.goBack()} /> : null}
+        {!requiredDone ? <Button label={t.permissions.later} variant="ghost" onPress={() => navigation.goBack()} /> : null}
       </View>
     </Screen>
   );

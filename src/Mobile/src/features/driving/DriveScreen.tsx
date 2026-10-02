@@ -10,7 +10,8 @@ import { useNow } from '../../hooks/useNow';
 import { useDrivingStore } from '../../store/drivingStore';
 import { useVoiceStore } from '../../store/voiceStore';
 import { useTheme } from '../../theme/ThemeProvider';
-import { formatElapsed, pluralize } from '../../utils/format';
+import { t } from '../../i18n/nl';
+import { minutesSince } from '../../utils/format';
 import { drivingController } from './drivingController';
 import { ConnectionPill } from './components/ConnectionPill';
 import { DriveButton } from './components/DriveButton';
@@ -34,9 +35,9 @@ export function DriveScreen() {
 
   const onDrivePress = async () => {
     if (journey.driving) {
-      Alert.alert('End drive?', 'You’ll leave nearby voice and stop sharing your location.', [
-        { text: 'Keep driving', style: 'cancel' },
-        { text: 'End drive', style: 'destructive', onPress: () => void drivingController.stop() },
+      Alert.alert(t.drive.confirmStop.title, t.drive.confirmStop.body, [
+        { text: t.drive.confirmStop.keepDriving, style: 'cancel' },
+        { text: t.drive.confirmStop.stop, style: 'destructive', onPress: () => void drivingController.stop() },
       ]);
       return;
     }
@@ -45,22 +46,15 @@ export function DriveScreen() {
     if (result === 'needsPermissions') {
       navigation.navigate('Permissions');
     } else if (result === 'locationServicesOff') {
-      Alert.alert('Location is turned off', 'Turn on Location Services to find drivers near you.');
+      Alert.alert(t.drive.startFailed.locationOffTitle, t.drive.startFailed.locationOffBody);
     } else if (result === 'offline') {
-      Alert.alert('You’re offline', 'Connect to the internet to start a drive.');
+      Alert.alert(t.drive.startFailed.offlineTitle, t.drive.startFailed.offlineBody);
     } else if (result === 'error') {
-      Alert.alert('Couldn’t start your drive', 'Please try again in a moment.');
+      Alert.alert(t.drive.startFailed.errorTitle, t.drive.startFailed.errorBody);
     }
   };
 
-  const voiceValue = {
-    off: 'Off',
-    standby: 'Standby',
-    connecting: 'Connecting',
-    live: 'Live',
-    reconnecting: 'Reconnecting',
-    retrying: 'Retrying',
-  }[journey.voice];
+  const voiceValue = t.voiceState[journey.voice];
 
   const voiceDot = journey.voice === 'live' ? colors.accent : journey.voice === 'off' ? colors.textFaint : colors.warning;
 
@@ -82,28 +76,26 @@ export function DriveScreen() {
           onPress={() => void onDrivePress()}
         />
         <AppText variant="title" align="center">
-          {journey.driving ? 'Driving' : 'Ready when you are'}
+          {journey.driving ? t.drive.titleActive : t.drive.titleIdle}
         </AppText>
         <AppText tone="muted" align="center">
-          {journey.driving
-            ? `${formatElapsed(session?.startedAt, now)} on the road`
-            : 'Start a drive and talk to drivers around you — hands-free.'}
+          {journey.driving ? t.drive.bodyActive(minutesSince(session?.startedAt, now)) : t.drive.bodyIdle}
         </AppText>
       </View>
 
       <View style={styles.tiles}>
         <StatusTile
           icon="people-outline"
-          label="Nearby"
-          value={journey.driving ? pluralize(journey.nearby, 'driver') : '—'}
-          detail={journey.driving ? (journey.nearby > 0 ? 'within 1 km' : 'looking around you') : 'start a drive'}
+          label={t.drive.nearbyLabel}
+          value={journey.driving ? t.drive.nearbyValue(journey.nearby) : t.drive.nearbyNone}
+          detail={journey.driving ? (journey.nearby > 0 ? t.drive.nearbyWithin : t.drive.nearbySearching) : t.drive.nearbyStartFirst}
           onPress={() => navigation.navigate('Main', { screen: 'Nearby' })}
         />
         <StatusTile
           icon="radio-outline"
-          label="Voice"
+          label={t.drive.voiceLabel}
           value={voiceValue}
-          detail={journey.voice === 'live' ? `${pluralize(inChannel, 'driver')} in channel` : journey.driving ? 'joins automatically' : undefined}
+          detail={journey.voice === 'live' ? t.drive.voiceInChannel(inChannel) : journey.driving ? t.drive.voiceAutomatic : undefined}
           dotColor={voiceDot}
           pulse={journey.voice === 'connecting' || journey.voice === 'reconnecting'}
           onPress={() => navigation.navigate('Main', { screen: 'Voice' })}
@@ -116,14 +108,14 @@ export function DriveScreen() {
           <View style={styles.privacy} accessibilityRole="text">
             <Ionicons name="location" size={14} color={colors.textMuted} />
             <AppText variant="caption" tone="muted">
-              Location shared while driving
+              {t.drive.privacyLocation}
             </AppText>
             <AppText variant="caption" tone="faint">
               ·
             </AppText>
             <Ionicons name={muted ? 'mic-off' : 'mic'} size={14} color={journey.voice === 'live' && !muted ? colors.accentText : colors.textMuted} />
             <AppText variant="caption" tone={journey.voice === 'live' && !muted ? 'accent' : 'muted'}>
-              {journey.voice === 'live' ? (muted ? 'Mic muted' : 'Mic live') : 'Mic idle'}
+              {journey.voice === 'live' ? (muted ? t.drive.micMuted : t.drive.micLive) : t.drive.micIdle}
             </AppText>
           </View>
         </>

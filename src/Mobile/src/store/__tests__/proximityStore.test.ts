@@ -36,7 +36,7 @@ describe('proximity store', () => {
   it('counts group members and other nearby drivers', () => {
     useProximityStore.getState().applySnapshot({
       ...snapshot(group('g1')),
-      nearby: [{ id: 'd3', displayName: 'Driver', avatarUrl: null, approxDistanceMeters: 900, inVoiceGroup: false }],
+      nearby: [{ id: 'd3', displayName: 'Rijder', avatarUrl: null, approxDistanceMeters: 900, inVoiceGroup: false }],
     });
     expect(nearbyCount(useProximityStore.getState())).toBe(2);
   });

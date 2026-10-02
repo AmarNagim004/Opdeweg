@@ -8,6 +8,7 @@ import { useUiStore } from '../../store/uiStore';
 import { logger } from '../../utils/logger';
 import { drivingController } from '../driving/drivingController';
 import type { AuthResponse, Me } from '../../types/api';
+import { t } from '../../i18n/nl';
 
 const PROFILE_KEY = 'opdeweg.profile.v1';
 
@@ -68,7 +69,7 @@ export const authController = {
       if (!cached) {
         // Offline with no cached profile: stay signed in with a minimal placeholder until we can reach the API.
         logger.warn('auth.restore_offline');
-        useAuthStore.getState().setSignedIn({ id: '', email: '', displayName: 'Driver', avatarUrl: null, shareDisplayName: true, createdAt: '' });
+        useAuthStore.getState().setSignedIn({ id: '', email: '', displayName: t.anonymousName, avatarUrl: null, shareDisplayName: true, createdAt: '' });
       }
     }
 

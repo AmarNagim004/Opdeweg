@@ -16,10 +16,10 @@ internal sealed partial class AppExceptionHandler(IProblemDetailsService problem
         {
             AppException app => (StatusFor(app.Kind), app.Code, app.Message),
             DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation } } =>
-                (StatusCodes.Status409Conflict, "conflict", "The request conflicts with a concurrent change. Please retry."),
-            RedisException or RedisTimeoutException => (StatusCodes.Status503ServiceUnavailable, "presence_unavailable", "Realtime presence is temporarily unavailable."),
-            OperationCanceledException when httpContext.RequestAborted.IsCancellationRequested => (499, "client_closed", "The request was cancelled."),
-            _ => (StatusCodes.Status500InternalServerError, "internal_error", "Something went wrong."),
+                (StatusCodes.Status409Conflict, "conflict", "Er veranderde net tegelijk iets anders. Probeer het nog een keer."),
+            RedisException or RedisTimeoutException => (StatusCodes.Status503ServiceUnavailable, "presence_unavailable", "Live-gegevens zijn even niet beschikbaar."),
+            OperationCanceledException when httpContext.RequestAborted.IsCancellationRequested => (499, "client_closed", "Het verzoek is afgebroken."),
+            _ => (StatusCodes.Status500InternalServerError, "internal_error", "Er ging iets mis."),
         };
 
         if (status >= 500)

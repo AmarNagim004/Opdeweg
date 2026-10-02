@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Modal, Platform, StyleSheet, View } from 'react-n
 import { AppText } from '../../../components/AppText';
 import { Button } from '../../../components/Button';
 import { TextField } from '../../../components/TextField';
+import { t } from '../../../i18n/nl';
 import { ApiError } from '../../../services/api/http';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { authController } from '../../auth/authController';
@@ -20,7 +21,7 @@ export function EditNameModal({ visible, initial, onClose }: { visible: boolean;
       await authController.updateProfile({ displayName: name });
       onClose();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Could not save your name.');
+      setError(e instanceof ApiError ? e.message : t.editName.failed);
     } finally {
       setSaving(false);
     }
@@ -30,11 +31,11 @@ export function EditNameModal({ visible, initial, onClose }: { visible: boolean;
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} onShow={() => setName(initial)}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.backdrop}>
         <View style={[styles.sheet, { backgroundColor: colors.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl }]}>
-          <AppText variant="headline">Display name</AppText>
-          <AppText tone="muted">This is what nearby drivers see, unless you hide it in Privacy.</AppText>
-          <TextField label="Name" value={name} onChangeText={setName} autoFocus maxLength={32} error={error} returnKeyType="done" onSubmitEditing={() => void save()} />
-          <Button label="Save" onPress={() => void save()} loading={saving} disabled={name.trim().length < 2} />
-          <Button label="Cancel" variant="ghost" onPress={onClose} />
+          <AppText variant="headline">{t.editName.title}</AppText>
+          <AppText tone="muted">{t.editName.body}</AppText>
+          <TextField label={t.editName.label} value={name} onChangeText={setName} autoFocus maxLength={32} error={error} returnKeyType="done" onSubmitEditing={() => void save()} />
+          <Button label={t.editName.save} onPress={() => void save()} loading={saving} disabled={name.trim().length < 2} />
+          <Button label={t.editName.cancel} variant="ghost" onPress={onClose} />
         </View>
       </KeyboardAvoidingView>
     </Modal>

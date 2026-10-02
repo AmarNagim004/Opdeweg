@@ -3,6 +3,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { AppText } from '../../../components/AppText';
 import { PulseRings } from '../../../components/PulseRings';
 import { ScalePressable } from '../../../components/Pressable';
+import { t } from '../../../i18n/nl';
 import { useTheme } from '../../../theme/ThemeProvider';
 
 interface DriveButtonProps {
@@ -28,8 +29,8 @@ export function DriveButton({ size = 216, driving, busy, live, onPress }: DriveB
         disabled={busy}
         pressedScale={0.95}
         accessibilityRole="button"
-        accessibilityLabel={driving ? 'Stop driving' : 'Start driving'}
-        accessibilityHint={driving ? 'Ends your drive and leaves nearby voice' : 'Starts sharing your approximate position and joins nearby voice automatically'}
+        accessibilityLabel={driving ? t.drive.stopA11y : t.drive.startA11y}
+        accessibilityHint={driving ? t.drive.stopHint : t.drive.startHint}
         accessibilityState={{ busy, checked: driving }}
         style={[styles.button, { width: size, height: size, borderRadius: size / 2, backgroundColor: fill, borderColor: colors.accent, shadowColor: colors.accent }]}
       >
@@ -39,7 +40,7 @@ export function DriveButton({ size = 216, driving, busy, live, onPress }: DriveB
           <>
             <Ionicons name={driving ? 'navigate' : 'navigate-outline'} size={Math.round(size * 0.26)} color={fg} />
             <AppText variant="headline" style={{ color: fg, marginTop: 8 }}>
-              {driving ? 'Stop' : 'Start'}
+              {driving ? t.drive.stop : t.drive.start}
             </AppText>
           </>
         )}

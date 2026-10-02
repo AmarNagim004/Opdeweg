@@ -39,7 +39,7 @@ internal static class RateLimitingSetup
                 }
 
                 await context.HttpContext.Response.WriteAsJsonAsync(
-                    new { title = "Too many requests.", status = 429, code = "rate_limited" },
+                    new { title = "Even rustig aan, te veel verzoeken. Probeer het zo nog een keer.", status = 429, code = "rate_limited" },
                     cancellationToken);
             };
 

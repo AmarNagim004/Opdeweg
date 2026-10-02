@@ -7,6 +7,7 @@ import { Button } from '../../components/Button';
 import { PulseRings } from '../../components/PulseRings';
 import { Screen } from '../../components/Screen';
 import { Wordmark } from '../../components/Wordmark';
+import { t } from '../../i18n/nl';
 import { useTheme } from '../../theme/ThemeProvider';
 import type { AuthStackParamList } from '../../navigation/types';
 
@@ -28,16 +29,16 @@ export function WelcomeScreen() {
           </View>
         </View>
         <AppText variant="display" align="center">
-          Talk to the road.
+          {t.welcome.title}
         </AppText>
         <AppText variant="body" tone="muted" align="center" style={styles.tagline}>
-          Drivers near you are connected automatically — hands-free, and out of range again when you part ways.
+          {t.welcome.body}
         </AppText>
       </View>
 
       <View style={styles.actions}>
-        <Button label="Get started" icon="arrow-forward" onPress={() => navigation.navigate('SignUp')} />
-        <Button label="I already have an account" variant="ghost" onPress={() => navigation.navigate('SignIn')} />
+        <Button label={t.welcome.getStarted} icon="arrow-forward" onPress={() => navigation.navigate('SignUp')} />
+        <Button label={t.welcome.haveAccount} variant="ghost" onPress={() => navigation.navigate('SignIn')} />
       </View>
     </Screen>
   );

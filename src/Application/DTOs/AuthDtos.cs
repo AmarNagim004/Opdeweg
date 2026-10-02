@@ -2,14 +2,24 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Opdeweg.Application.DTOs;
 
+/// <summary>Validation messages people can see (Dutch, like the app).</summary>
+internal static class FieldMessages
+{
+    public const string Email = "Vul een geldig e-mailadres in.";
+    public const string Password = "Kies een wachtwoord van 8 tot 128 tekens.";
+    public const string PasswordMissing = "Vul je wachtwoord in.";
+    public const string DisplayName = "Je naam moet 2 tot 32 tekens zijn.";
+    public const string AvatarUrl = "Deze link naar je profielfoto is te lang.";
+}
+
 public sealed record RegisterRequest(
-    [Required, EmailAddress, MaxLength(254)] string Email,
-    [Required, MinLength(8), MaxLength(128)] string Password,
-    [Required, MinLength(2), MaxLength(32)] string DisplayName);
+    [Required(ErrorMessage = FieldMessages.Email), EmailAddress(ErrorMessage = FieldMessages.Email), MaxLength(254, ErrorMessage = FieldMessages.Email)] string Email,
+    [Required(ErrorMessage = FieldMessages.Password), MinLength(8, ErrorMessage = FieldMessages.Password), MaxLength(128, ErrorMessage = FieldMessages.Password)] string Password,
+    [Required(ErrorMessage = FieldMessages.DisplayName), MinLength(2, ErrorMessage = FieldMessages.DisplayName), MaxLength(32, ErrorMessage = FieldMessages.DisplayName)] string DisplayName);
 
 public sealed record LoginRequest(
-    [Required, MaxLength(254)] string Email,
-    [Required, MaxLength(128)] string Password);
+    [Required(ErrorMessage = FieldMessages.Email), MaxLength(254, ErrorMessage = FieldMessages.Email)] string Email,
+    [Required(ErrorMessage = FieldMessages.PasswordMissing), MaxLength(128, ErrorMessage = FieldMessages.Password)] string Password);
 
 public sealed record RefreshRequest([Required, MaxLength(256)] string RefreshToken);
 
@@ -32,6 +42,6 @@ public sealed record MeDto(
     DateTimeOffset CreatedAt);
 
 public sealed record UpdateProfileRequest(
-    [MinLength(2), MaxLength(32)] string? DisplayName,
-    [MaxLength(2048)] string? AvatarUrl,
+    [MinLength(2, ErrorMessage = FieldMessages.DisplayName), MaxLength(32, ErrorMessage = FieldMessages.DisplayName)] string? DisplayName,
+    [MaxLength(2048, ErrorMessage = FieldMessages.AvatarUrl)] string? AvatarUrl,
     bool? ShareDisplayName);

@@ -10,7 +10,7 @@ import { useProximityStore } from '../../store/proximityStore';
 import { useUiStore } from '../../store/uiStore';
 import { useVoiceStore } from '../../store/voiceStore';
 import { useTheme } from '../../theme/ThemeProvider';
-import { formatDistance, pluralize } from '../../utils/format';
+import { t } from '../../i18n/nl';
 import { DriverRow } from './components/DriverRow';
 
 export function NearbyScreen() {
@@ -27,24 +27,24 @@ export function NearbyScreen() {
   return (
     <Screen scroll>
       <AppText variant="title" accessibilityRole="header" style={styles.title}>
-        Nearby
+        {t.nearby.title}
       </AppText>
 
       <View style={[styles.countPill, { backgroundColor: colors.surface, borderRadius: radius.pill }]}>
         <StatusDot color={journey.nearby > 0 ? colors.accent : colors.textFaint} pulse={journey.driving && journey.nearby === 0} />
-        <AppText variant="label">{journey.driving ? `${pluralize(journey.nearby, 'driver')} nearby` : 'Not driving'}</AppText>
+        <AppText variant="label">{journey.driving ? t.nearby.count(journey.nearby) : t.nearby.notDriving}</AppText>
       </View>
 
       {!journey.driving ? (
-        <EmptyState icon="car-sport-outline" title="Start a drive to see who’s around" body={`Drivers within ${formatDistance(joinDistance)} of you appear here automatically.`} />
+        <EmptyState icon="car-sport-outline" title={t.nearby.emptyIdleTitle} body={t.nearby.emptyIdleBody(joinDistance)} />
       ) : journey.nearby === 0 ? (
-        <EmptyState icon="radio-outline" title="No drivers nearby yet" body="We’ll connect you the moment someone is in range. No need to touch your phone." />
+        <EmptyState icon="radio-outline" title={t.nearby.emptyDrivingTitle} body={t.nearby.emptyDrivingBody} />
       ) : (
         <>
           {members.length > 0 ? (
             <Card padded={false} style={styles.section}>
               <AppText variant="overline" tone="muted" style={styles.sectionLabel}>
-                In your voice channel
+                {t.nearby.inChannel}
               </AppText>
               {members.map((driver, index) => (
                 <View key={driver.id} style={index > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
@@ -57,7 +57,7 @@ export function NearbyScreen() {
           {nearby.length > 0 ? (
             <Card padded={false} style={styles.section}>
               <AppText variant="overline" tone="muted" style={styles.sectionLabel}>
-                Also nearby
+                {t.nearby.alsoNearby}
               </AppText>
               {nearby.map((driver, index) => (
                 <View key={driver.id} style={index > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border }}>
@@ -72,7 +72,7 @@ export function NearbyScreen() {
       <View style={styles.note}>
         <Ionicons name="shield-checkmark-outline" size={16} color={colors.textMuted} />
         <AppText variant="caption" tone="muted" style={styles.noteText}>
-          Distances are approximate. Exact locations are never shared with other drivers.
+          {t.nearby.privacyNote}
         </AppText>
       </View>
     </Screen>

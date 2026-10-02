@@ -57,5 +57,5 @@ public sealed class ProfileService(
         Log.AccountDeleted(logger, userId);
     }
 
-    private static AppException UnknownUser() => AppException.Unauthorized("unknown_user", "The account no longer exists.");
+    private static AppException UnknownUser() => AppException.Unauthorized("unknown_user", "Dit account bestaat niet meer.");
 }

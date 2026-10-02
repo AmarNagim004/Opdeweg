@@ -38,7 +38,7 @@ Behaviour:
 | Permission | Type | Why |
 | --- | --- | --- |
 | `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` | runtime | Location during a drive. |
-| `ACCESS_BACKGROUND_LOCATION` | runtime, optional ("Allow all the time") | Recovery after process restarts; not needed while the drive service runs. |
+| `ACCESS_BACKGROUND_LOCATION` | runtime, optional ("Altijd toestaan") | Recovery after process restarts; not needed while the drive service runs. |
 | `RECORD_AUDIO`, `MODIFY_AUDIO_SETTINGS` | runtime / normal | Voice and audio routing. |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`, `FOREGROUND_SERVICE_MICROPHONE` | normal | The drive service (Android 14+ requires typed services). |
 | `POST_NOTIFICATIONS` | runtime (13+) | Shows the ongoing "Driving" notification. |

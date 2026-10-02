@@ -1,5 +1,6 @@
 import { isDriveServiceAvailable, startDriveService, stopDriveService } from '../../../modules/opdeweg-drive-service';
 import { logger } from '../../utils/logger';
+import { t } from '../../i18n/nl';
 
 /** Android: one foreground service (location|microphone) for the whole drive. iOS: no-op. */
 export const driveService = {
@@ -13,8 +14,8 @@ export const driveService = {
 
     try {
       await startDriveService({
-        title: 'Opdeweg · Driving',
-        body: 'Sharing your approximate position with nearby drivers. Voice is live when drivers are close.',
+        title: t.notification.title,
+        body: t.notification.body,
       });
       return true;
     } catch (error) {

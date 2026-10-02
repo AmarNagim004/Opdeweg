@@ -83,7 +83,7 @@ Why cliques instead of "everyone within 1 km of someone"? Connected components c
 (a traffic jam would become one 20 km voice room). Cliques guarantee every listener is within range of
 every speaker, and map cleanly onto SFU rooms that the server can authorise and police. The trade-off:
 a driver between two separate groups joins one of them (preferring the larger); the Nearby screen shows
-the others as "Nearby · other channel".
+the others as "In de buurt · ander kanaal".
 
 ### Consistency and scaling
 

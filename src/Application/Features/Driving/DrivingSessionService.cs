@@ -35,7 +35,8 @@ public sealed class DrivingSessionService(
     TimeProvider time,
     ILogger<DrivingSessionService> logger)
 {
-    private const string AnonymousName = "Driver";
+    /// <summary>What others see when a driver hides their name.</summary>
+    public const string AnonymousName = "Rijder";
     private static readonly TimeSpan RemovalTimeout = TimeSpan.FromSeconds(3);
 
     public async Task<DrivingSessionDto?> GetCurrentAsync(Guid userId, CancellationToken cancellationToken)
@@ -49,7 +50,7 @@ public sealed class DrivingSessionService(
     {
         var now = time.GetUtcNow();
         var user = await users.GetByIdAsync(userId, cancellationToken)
-            ?? throw AppException.Unauthorized("unknown_user", "The account no longer exists.");
+            ?? throw AppException.Unauthorized("unknown_user", "Dit account bestaat niet meer.");
 
         var session = await sessions.GetActiveAsync(userId, cancellationToken);
         var isNew = session is null;

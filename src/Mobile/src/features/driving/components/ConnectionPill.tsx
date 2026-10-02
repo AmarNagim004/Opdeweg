@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { AppText } from '../../../components/AppText';
 import { StatusDot } from '../../../components/StatusDot';
+import { t } from '../../../i18n/nl';
 import { useJourney } from '../../../hooks/useJourney';
 import { useConnectivityStore } from '../../../store/connectivityStore';
 import { useTheme } from '../../../theme/ThemeProvider';
@@ -12,15 +13,15 @@ export function ConnectionPill() {
   const backendReachable = useConnectivityStore((s) => s.backendReachable);
 
   const [label, color, pulse] = journey.offline
-    ? ['Offline', colors.danger, false]
+    ? [t.connection.offline, colors.danger, false]
     : !backendReachable
-      ? ['Server unreachable', colors.warning, true]
+      ? [t.connection.serverUnreachable, colors.warning, true]
       : realtime === 'connected'
-        ? ['Connected', colors.accent, false]
-        : ['Connecting', colors.warning, true];
+        ? [t.connection.connected, colors.accent, false]
+        : [t.connection.connecting, colors.warning, true];
 
   return (
-    <View accessibilityRole="text" accessibilityLabel={`Connection: ${label}`} style={[styles.pill, { backgroundColor: colors.surface, borderRadius: radius.pill, borderColor: colors.border }]}>
+    <View accessibilityRole="text" accessibilityLabel={t.connection.a11y(label)} style={[styles.pill, { backgroundColor: colors.surface, borderRadius: radius.pill, borderColor: colors.border }]}>
       <StatusDot color={color} size={8} pulse={pulse} />
       <AppText variant="caption">{label}</AppText>
     </View>

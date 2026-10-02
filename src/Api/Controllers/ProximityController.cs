@@ -22,7 +22,7 @@ public sealed class ProximityController(ProximityQueryService query, VoiceAccess
     [HttpPost("voice/token")]
     public async Task<VoiceAccessDto> IssueVoiceToken(CancellationToken cancellationToken) =>
         await voice.IssueForCurrentGroupAsync(User.GetUserId(), cancellationToken)
-        ?? throw AppException.Conflict("not_in_group", "You are not in a proximity group right now.");
+        ?? throw AppException.Conflict("not_in_group", "Je zit nu niet in een kanaal.");
 
     /// <summary>Server-driven client tuning, so thresholds can change without an app release.</summary>
     [HttpGet("config")]

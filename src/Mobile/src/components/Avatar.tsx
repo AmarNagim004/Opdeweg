@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
+import { t } from '../i18n/nl';
 import { avatarHue, initials } from '../utils/format';
 import { AppText } from './AppText';
 
@@ -21,7 +22,7 @@ export function Avatar({ id, name, size = 48, speaking = false, dimmed = false }
 
   return (
     <View
-      accessibilityLabel={speaking ? `${name}, speaking` : name}
+      accessibilityLabel={speaking ? t.avatar.speakingA11y(name) : name}
       style={{
         width: size + ring * 2,
         height: size + ring * 2,

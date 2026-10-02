@@ -1,6 +1,7 @@
 import { appConfig } from '../config';
 import { tokenManager } from '../auth/tokenManager';
 import type { ProblemDetails } from '../../types/api';
+import { t } from '../../i18n/nl';
 
 export class ApiError extends Error {
   constructor(
@@ -43,7 +44,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
         signal: controller.signal,
       });
     } catch {
-      throw new ApiError('No connection to Opdeweg.', 0, 'network_error');
+      throw new ApiError(t.network.noConnection, 0, 'network_error');
     } finally {
       clearTimeout(timeout);
     }
@@ -51,14 +52,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   let token = auth ? await tokenManager.getAccessToken() : null;
   if (auth && !token) {
-    throw new ApiError('Please sign in again.', 401, 'unauthenticated');
+    throw new ApiError(t.network.signInAgain, 401, 'unauthenticated');
   }
 
   let response = await send(token);
   if (auth && response.status === 401) {
     token = await tokenManager.getAccessToken(true);
     if (!token) {
-      throw new ApiError('Please sign in again.', 401, 'unauthenticated');
+      throw new ApiError(t.network.signInAgain, 401, 'unauthenticated');
     }
 
     response = await send(token);
@@ -73,7 +74,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   if (!response.ok) {
     const problem = (json ?? {}) as ProblemDetails;
-    throw new ApiError(problem.title ?? `Request failed (${response.status}).`, response.status, problem.code ?? `http_${response.status}`);
+    throw new ApiError(problem.title ?? t.network.requestFailed(response.status), response.status, problem.code ?? `http_${response.status}`);
   }
 
   return json as T;

@@ -10,6 +10,7 @@ import {
 } from 'livekit-client';
 import type { VoiceAccess } from '../../types/api';
 import { logger } from '../../utils/logger';
+import { t } from '../../i18n/nl';
 
 export interface VoiceRoomParticipant {
   identity: string;
@@ -158,7 +159,7 @@ export class VoiceRoom {
 function toParticipant(p: RemoteParticipant | Participant): VoiceRoomParticipant {
   return {
     identity: p.identity,
-    name: p.name || 'Driver',
+    name: p.name || t.anonymousName,
     isSpeaking: p.isSpeaking,
     isMuted: !p.isMicrophoneEnabled,
   };

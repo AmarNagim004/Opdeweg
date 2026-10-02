@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
 import { LOCATION_TASK } from './locationTaskName';
 import type { LocationSample } from './locationThrottle';
+import { t } from '../../i18n/nl';
 
 export function toSample(location: Location.LocationObject): LocationSample | null {
   // Never transmit mock-provider fixes from release builds: they are a trivial spoofing vector.
@@ -42,8 +43,8 @@ export async function startLocationUpdates(options: { needsOwnForegroundService:
     // foreground; expo-location's own service is only used as a fallback without it.
     foregroundService: options.needsOwnForegroundService
       ? {
-          notificationTitle: 'Opdeweg · Driving',
-          notificationBody: 'Sharing your approximate position with nearby drivers.',
+          notificationTitle: t.notification.title,
+          notificationBody: t.notification.locationOnlyBody,
           notificationColor: '#C8F03A',
           killServiceOnDestroy: true,
         }

@@ -12,7 +12,7 @@ public static class CredentialRules
         var trimmed = (email ?? string.Empty).Trim().ToLowerInvariant();
         if (trimmed.Length is 0 or > User.EmailMaxLength || !MailAddress.TryCreate(trimmed, out var parsed) || parsed.Address != trimmed)
         {
-            throw AppException.Validation("invalid_email", "Enter a valid e-mail address.");
+            throw AppException.Validation("invalid_email", "Vul een geldig e-mailadres in.");
         }
 
         return trimmed;
@@ -22,7 +22,7 @@ public static class CredentialRules
     {
         if (string.IsNullOrEmpty(password) || password.Length < minLength || password.Length > 128)
         {
-            throw AppException.Validation("weak_password", $"Use a password of at least {minLength} characters.");
+            throw AppException.Validation("weak_password", $"Kies een wachtwoord van minimaal {minLength} tekens.");
         }
     }
 
@@ -58,7 +58,7 @@ public static class CredentialRules
         {
             throw AppException.Validation(
                 "invalid_display_name",
-                $"Display names are {User.DisplayNameMinLength}–{User.DisplayNameMaxLength} characters.");
+                $"Je naam moet {User.DisplayNameMinLength} tot {User.DisplayNameMaxLength} tekens zijn.");
         }
 
         return normalized;
@@ -76,7 +76,7 @@ public static class CredentialRules
             !Uri.TryCreate(trimmed, UriKind.Absolute, out var uri) ||
             uri.Scheme != Uri.UriSchemeHttps)
         {
-            throw AppException.Validation("invalid_avatar_url", "Avatar URLs must be https links.");
+            throw AppException.Validation("invalid_avatar_url", "Een link naar je profielfoto moet met https beginnen.");
         }
 
         return uri.ToString();
