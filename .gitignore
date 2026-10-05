@@ -427,3 +427,12 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# ---- Opdeweg ----
+# Local environment files (never commit secrets)
+.env
+.env.*
+!.env.example
+# Node / Expo
+node_modules/
+.expo/

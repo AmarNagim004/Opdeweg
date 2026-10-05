@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+  <application>
+    <!--
+      One foreground service for the whole driving session. While it runs, the process counts as
+      "foreground", so fused-location updates keep flowing at full rate with the screen locked and
+      the microphone stays usable for proximity voice (Android 14+ requires both service types).
+    -->
+    <service
+      android:name=".DriveForegroundService"
+      android:exported="false"
+      android:foregroundServiceType="location|microphone" />
+  </application>
+</manifest>
