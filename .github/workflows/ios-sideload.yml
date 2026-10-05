@@ -1,0 +1,54 @@
+name: iOS sideload build
+
+# Builds an unsigned "Opdeweg Dev" development build (.ipa) for sideloading with Sideloadly/AltStore,
+# which re-sign it with a free Apple ID. Run manually from the Actions tab.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: src/Mobile
+    env:
+      APP_VARIANT: development
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Mobile/package-lock.json
+      - run: npm ci
+      - run: npx expo prebuild --platform ios --no-install
+      - run: pod install
+        working-directory: src/Mobile/ios
+      - name: Build unsigned app
+        run: |
+          WORKSPACE=$(ls -d ios/*.xcworkspace | head -n 1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          xcodebuild build \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Debug \
+            -sdk iphoneos \
+            -destination generic/platform=iOS \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+      - name: Package .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Debug-iphoneos/*.app Payload/
+          zip -qr Opdeweg-Dev.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Opdeweg-Dev-ipa
+          path: src/Mobile/Opdeweg-Dev.ipa
+          retention-days: 7
